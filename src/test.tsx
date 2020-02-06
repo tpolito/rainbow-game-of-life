@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 // Number of Rows & Columns for the grid
 const totalRows: number = 40;
-const totalCols: number = 80;
+const totalCols: number = 60;
 
 // Function to create a new grid
 const newBoardStatus = (cellStatus = () => Math.random() < 0.3) => {
@@ -48,26 +48,10 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
 
 // App
 const App: React.FC = () => {
-  // TODO: Bundle all of the state into one object
   // App State
-  // const [boardStatus, setBoardStatus] = useState(newBoardStatus());
-  // const [gameRunning, setGameRunning] = useState(false);
-  const [gameStatus, setGameStatus] = useState({
-    boardStatus: newBoardStatus(),
-    gameRunning: false
-  });
+  const [boardStatus, setBoardStatus] = useState(newBoardStatus());
 
-  // Stop Function
-  const handleStop = () => {
-    setGameStatus({ ...gameStatus, gameRunning: false });
-  };
-  // Start Function
-  const handleStart = () => {
-    setGameStatus({ ...gameStatus, gameRunning: true });
-  };
-
-  // Moves to next generation
-  const handleGeneration = useCallback(() => {
+  const handleGeneration = () => {
     const nextStep = (prevBoard: boolean[][]) => {
       const boardStatus: boolean[][] = prevBoard;
       const clonedBoardStatus = JSON.parse(JSON.stringify(boardStatus));
@@ -117,24 +101,10 @@ const App: React.FC = () => {
 
       return clonedBoardStatus;
     };
-    let prevBoard: boolean[][] = gameStatus.boardStatus;
+    let prevBoard: boolean[][] = boardStatus;
 
-    setGameStatus({ ...gameStatus, boardStatus: nextStep(prevBoard) });
-  }, [gameStatus]);
-
-  useEffect(() => {
-    let timer;
-
-    if (gameStatus.gameRunning === false) {
-      clearInterval(timer);
-    }
-
-    if (gameStatus.gameRunning) {
-      timer = setInterval(() => {
-        handleGeneration();
-      }, 1000);
-    }
-  }, [gameStatus.boardStatus, gameStatus.gameRunning, handleGeneration]);
+    setBoardStatus(nextStep(prevBoard));
+  };
 
   return (
     <div className='App'>
@@ -147,10 +117,8 @@ const App: React.FC = () => {
           🧬
         </span>
       </h1>
-      <BoardGrid boardStatus={gameStatus.boardStatus} />
+      <BoardGrid boardStatus={boardStatus} />
       <button onClick={handleGeneration}>Test</button>
-      <button onClick={handleStart}>Start Game</button>
-      <button onClick={handleStop}>Stop Game</button>
     </div>
   );
 };
