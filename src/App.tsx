@@ -48,10 +48,7 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
 
 // App
 const App: React.FC = () => {
-  // TODO: Bundle all of the state into one object
   // App State
-  // const [boardStatus, setBoardStatus] = useState(newBoardStatus());
-  // const [gameRunning, setGameRunning] = useState(false);
   const [gameStatus, setGameStatus] = useState({
     boardStatus: newBoardStatus(),
     gameRunning: false
@@ -122,17 +119,12 @@ const App: React.FC = () => {
     setGameStatus({ ...gameStatus, boardStatus: nextStep(prevBoard) });
   }, [gameStatus]);
 
+  // Runs the animation
   useEffect(() => {
-    let timer;
-
-    if (gameStatus.gameRunning === false) {
-      clearInterval(timer);
-    }
-
-    if (gameStatus.gameRunning) {
-      timer = setInterval(() => {
-        handleGeneration();
-      }, 1000);
+    if (!gameStatus.gameRunning) {
+      return;
+    } else {
+      handleGeneration();
     }
   }, [gameStatus.boardStatus, gameStatus.gameRunning, handleGeneration]);
 
