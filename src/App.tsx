@@ -33,7 +33,10 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
       td.push(
         <td
           key={`${r},${c}`}
-          className={boardStatus[r][c] ? 'alive' : 'dead'}
+          // className={boardStatus[r][c] ? 'alive' : 'dead'}
+          style={{
+            backgroundColor: `${boardStatus[r][c] ? 'coral' : 'white'}`
+          }}
         />
       );
     }
@@ -129,7 +132,8 @@ const App: React.FC = () => {
     } else {
       timer = setInterval(() => {
         handleGeneration();
-      }, 500);
+        //TODO: Figure out why this won't run at anything below 500ms (works sometimes at 300ms)
+      }, 200);
 
       return () => clearInterval(timer);
     }
