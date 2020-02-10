@@ -120,19 +120,26 @@ const App: React.FC = () => {
   }, [gameStatus]);
 
   // Runs the animation
+  // https://reacttraining.com/blog/useEffect-is-not-the-new-componentDidMount/
   useEffect(() => {
+    let timer: any;
+
     if (!gameStatus.gameRunning) {
-      return;
+      clearInterval(timer);
     } else {
-      handleGeneration();
+      timer = setInterval(() => {
+        handleGeneration();
+      }, 500);
+
+      return () => clearInterval(timer);
     }
-  }, [gameStatus.boardStatus, gameStatus.gameRunning, handleGeneration]);
+  }, [gameStatus.gameRunning, handleGeneration]);
 
   return (
     <div className='App'>
       <h1>
         <span aria-label='dna-strand' role='img'>
-          🧬
+          🌈
         </span>
         Game of Life
         <span aria-label='dna-strand' role='img'>
@@ -140,9 +147,15 @@ const App: React.FC = () => {
         </span>
       </h1>
       <BoardGrid boardStatus={gameStatus.boardStatus} />
-      <button onClick={handleGeneration}>Test</button>
-      <button onClick={handleStart}>Start Game</button>
-      <button onClick={handleStop}>Stop Game</button>
+      <button className='button' onClick={handleGeneration}>
+        Test
+      </button>
+      <button className='button' onClick={handleStart}>
+        Start Game
+      </button>
+      <button className='button' onClick={handleStop}>
+        Stop Game
+      </button>
     </div>
   );
 };
