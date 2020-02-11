@@ -70,7 +70,9 @@ const App: React.FC = () => {
   const handleGeneration = useCallback(() => {
     const nextStep = (prevBoard: boolean[][]) => {
       const boardStatus: boolean[][] = prevBoard;
+      // This is where the array gets blanked
       const clonedBoardStatus = JSON.parse(JSON.stringify(boardStatus));
+      // const clonedBoardStatus = boardStatus;
 
       const findNeighbors = (r: number, c: number) => {
         const neighbors: number[][] = [
