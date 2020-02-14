@@ -116,7 +116,6 @@ const App: React.FC = () => {
           }
         }
       }
-
       return clonedBoardStatus;
     };
     let prevBoard: boolean[][] = gameStatus.boardStatus;
