@@ -1,0 +1,15 @@
+Bugs:
+☐ Game does not run properly on "rainbow" branch. I think its either calulating the neighbors incorrectly or cells are not living/dying when they should be @created(20-02-13 10:27)
+
+
+Project Roadmap:
+☐ Implement the "rainbow" feature @created(20-02-13 10:26)
+☐ Add Game Tracking: @created(20-02-13 10:28)
+  ☐ Generation Count@created(20-02-13 10:29)
+  ☐ Living and Dead Cell Count @created(20-02-13 10:29)
+☐ Optimize controls @created(20-02-13 10:29)
+  ☐ Start/Stop button state @created(20-02-13 10:29)
+  ☐ Speed slider @created(20-02-13 10:29)
+
+Misc: 
+☐ Add this to master branch @created(20-02-13 10:30)
