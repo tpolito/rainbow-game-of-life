@@ -5,6 +5,11 @@ import './App.css';
 const totalRows: number = 40;
 const totalCols: number = 80;
 
+// Generate a random number from a min to max
+const randomNum = (min: number, max: number) => {
+  return min + Math.random() * (max - min);
+};
+
 // Function to create a new grid
 const newBoardStatus = (cellStatus = () => (Math.random() < 0.3 ? 1 : 0)) => {
   const grid: any[][] = [];
@@ -13,7 +18,9 @@ const newBoardStatus = (cellStatus = () => (Math.random() < 0.3 ? 1 : 0)) => {
     for (let c = 0; c < totalCols; c++) {
       grid[r][c] = {
         status: cellStatus(),
-        color: `coral`
+        h: randomNum(1, 360),
+        s: randomNum(0, 100),
+        l: randomNum(0, 100)
       };
     }
   }
@@ -34,12 +41,12 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
         <td
           key={`${r},${c}`}
           style={{
-            backgroundColor: boardStatus[r][c].status
-              ? boardStatus[r][c].color
-              : 'white'
+            backgroundColor:
+              boardStatus[r][c].status === 1
+                ? `hsl(${boardStatus[r][c].h}, ${boardStatus[r][c].s}%, ${boardStatus[r][c].l}%`
+                : 'white'
           }}
           data-cord={`${r},${c}`}
-          // data-status={boardStatus[r][c].status ? 'alive' : 'dead'}
         />
       );
     }
@@ -55,44 +62,6 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
 // App
 const App: React.FC = () => {
   // App State
-  const testStatus = [
-    [
-      { status: 0, color: 'coral' },
-      { status: 1, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' }
-    ],
-    [
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' }
-    ],
-    [
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' }
-    ],
-    [
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' }
-    ],
-    [
-      { status: 0, color: 'coral' },
-      { status: 1, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' },
-      { status: 0, color: 'coral' }
-    ]
-  ];
-
   const [gameStatus, setGameStatus] = useState({
     boardStatus: newBoardStatus(),
     gameRunning: false
@@ -112,99 +81,56 @@ const App: React.FC = () => {
     const nextStep = (prevBoard: any[][]) => {
       const boardStatus: any[][] = prevBoard;
 
-      // const deepClone = (array: any) => {
-      //   const clone = array.map((element: any) => {
-      //     return Array.isArray(element) ? deepClone(element) : element;
-      //   });
-
-      //   return clone;
-      // };
-
       const clonedBoardStatus = JSON.parse(JSON.stringify(boardStatus));
-      // const clonedBoardStatus = boardStatus;
-
-      // const findNeighbors = (r: number, c: number) => {
-      //   const neighbors: number[][] = [
-      //     [-1, -1],
-      //     [-1, 0],
-      //     [-1, 1],
-      //     [0, 1],
-      //     [1, 1],
-      //     [1, 0],
-      //     [1, -1],
-      //     [0, -1]
-      //   ];
-
-      //   return neighbors.reduce((trueNeighbors: number, neighbor) => {
-      //     const x = r + neighbor[0];
-      //     const y = c + neighbor[1];
-
-      //     const isNeighborOnBoard: boolean =
-      //       x >= 0 && x < totalRows && y >= 0 && y < totalCols;
-
-      //     if (
-      //       trueNeighbors < 4 &&
-      //       isNeighborOnBoard &&
-      //       boardStatus[x][y].status
-      //     ) {
-      //       return trueNeighbors + 1;
-      //     } else {
-      //       return trueNeighbors;
-      //     }
-      //   }, 0);
-      // };
 
       const findNeighbors = (r: number, c: number) => {
         let sum: number = 0;
+        // Color is equal to the color value of the cell
+        let color: number = boardStatus[r][c].h;
+
         const numberOfRows = boardStatus.length;
         const numberOfCols = boardStatus[0].length;
 
+        // Check each neighboring cells status
         for (let i = -1; i < 2; i++) {
           for (let j = -1; j < 2; j++) {
             const row = (r + i + numberOfRows) % numberOfRows;
             const col = (c + j + numberOfCols) % numberOfCols;
 
+            color += boardStatus[row][col].h;
+
             sum += boardStatus[row][col].status;
           }
         }
 
+        // -= to remove the value of the cell being checked from the equation
         sum -= boardStatus[r][c].status;
 
-        // console.log(`Cell: (${r},${c}) has ${sum} neighbors`);
-        return sum;
+        color = color / sum;
+
+        return { sum: sum, color: color };
       };
 
       for (let r = 0; r < totalRows; r++) {
         for (let c = 0; c < totalCols; c++) {
-          const totalNeighbors = findNeighbors(r, c);
+          // Find Neighbors returns a sum of total living neighbors and a color value
+          const sumAndColor = findNeighbors(r, c);
 
-          // console.log(`totalNighbors of ${r},${c} = ${totalNeighbors}`);
+          const { sum, color } = sumAndColor;
 
+          clonedBoardStatus[r][c].h = color;
           if (!boardStatus[r][c].status) {
-            if (totalNeighbors === 3) {
+            if (sum === 3) {
               clonedBoardStatus[r][c].status = 1;
             }
           } else {
-            if (totalNeighbors < 2 || totalNeighbors > 3) {
+            if (sum < 2 || sum > 3) {
               clonedBoardStatus[r][c].status = 0;
             }
           }
-
-          // if (boardStatus[r][c].status === 0 && totalNeighbors === 3) {
-          //   clonedBoardStatus[r][c].status = 1;
-          // } else if (
-          //   boardStatus[r][c].status === 1 &&
-          //   (totalNeighbors < 2 || totalNeighbors > 3)
-          // ) {
-          //   clonedBoardStatus[r][c].status = 0;
-          // } else {
-          //   clonedBoardStatus[r][c].status = boardStatus[r][c].status;
-          // }
         }
       }
-      // console.log(clonedBoardStatus);
-      // console.log(boardStatus);
-      // console.log(prevBoard);
+
       return clonedBoardStatus;
     };
 
@@ -258,9 +184,15 @@ const App: React.FC = () => {
 
       <BoardGrid boardStatus={gameStatus.boardStatus} />
 
-      <button className='button' onClick={handleGeneration}>
-        Test
-      </button>
+      {gameStatus.gameRunning ? (
+        <button className='button' disabled onClick={handleGeneration}>
+          Test
+        </button>
+      ) : (
+        <button className='button' onClick={handleGeneration}>
+          Test
+        </button>
+      )}
 
       <button className='button' onClick={countLiving}>
         Count Living

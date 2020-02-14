@@ -1,9 +1,10 @@
 Bugs:
-☐ Game does not run properly on "rainbow" branch. I think its either calulating the neighbors incorrectly or cells are not living/dying when they should be @created(20-02-13 10:27)
+✔ Game does not run properly on "rainbow" branch. I think its either calulating the neighbors incorrectly or cells are not living/dying when they should be @created(20-02-13 10:27) @done(20-02-14 12:04)
 
 
 Project Roadmap:
-☐ Implement the "rainbow" feature @created(20-02-13 10:26)
+☐ Implement the "rainbow" feature @created(20-02-13 10:26) 
+  ☐ Figure out the best way to add color to each cell. Right now the whole page goes white as each number hit infinity. @created(20-02-14 12:04)
 ☐ Add Game Tracking: @created(20-02-13 10:28)
   ☐ Generation Count@created(20-02-13 10:29)
   ☐ Living and Dead Cell Count @created(20-02-13 10:29)
@@ -12,4 +13,4 @@ Project Roadmap:
   ☐ Speed slider @created(20-02-13 10:29)
 
 Misc: 
-☐ Add this to master branch @created(20-02-13 10:30)
+✔ Add this to master branch @created(20-02-13 10:30) @done(20-02-14 12:04)
