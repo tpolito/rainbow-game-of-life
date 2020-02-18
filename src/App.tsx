@@ -231,16 +231,6 @@ const App: React.FC = () => {
       ) : null}
 
       {gameStatus.gameRunning ? (
-        <button className='button' disabled onClick={handleGeneration}>
-          Test
-        </button>
-      ) : (
-        <button className='button' onClick={handleGeneration}>
-          Test
-        </button>
-      )}
-
-      {gameStatus.gameRunning ? (
         <button className='button' onClick={handleStop}>
           Stop Game
         </button>
