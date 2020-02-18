@@ -3,13 +3,15 @@ Bugs:
 
 
 Project Roadmap:
-☐ Implement the "rainbow" feature @created(20-02-13 10:26) 
-  ☐ Figure out the best way to add color to each cell. Right now the whole page goes white as each number hit infinity. @created(20-02-14 12:04)
-☐ Add Game Tracking: @created(20-02-13 10:28)
-  ☐ Generation Count@created(20-02-13 10:29)
-  ☐ Living and Dead Cell Count @created(20-02-13 10:29)
+✔ Implement the "rainbow" feature @created(20-02-13 10:26) @done(20-02-18 09:17)
+  Figure out the best way to add color to each cell. Right now the whole page goes white as each number hit infinity.
+  Right now the function is taking the average of all living cells and assiging the value there.
+  
+✔ Add Game Tracking: @created(20-02-13 10:28) @done(20-02-18 09:17)
+  ✔ Generation Count@created(20-02-13 10:29) @done(20-02-18 09:17)
+  ✔ Living and Dead Cell Count @created(20-02-13 10:29) @done(20-02-18 09:17)
 ☐ Optimize controls @created(20-02-13 10:29)
-  ☐ Start/Stop button state @created(20-02-13 10:29)
+  ✔ Start/Stop button state @created(20-02-13 10:29) @done(20-02-18 09:17)
   ☐ Speed slider @created(20-02-13 10:29)
 
 Misc: 

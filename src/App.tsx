@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import defaultState from './defaultState.json';
 import './App.css';
 
 // Number of Rows & Columns for the grid
@@ -20,7 +21,7 @@ const newBoardStatus = (cellStatus = () => (Math.random() < 0.3 ? 1 : 0)) => {
         status: cellStatus(),
         h: randomNum(1, 360),
         s: randomNum(0, 100),
-        l: randomNum(0, 100)
+        l: randomNum(25, 75)
       };
     }
   }
@@ -29,7 +30,7 @@ const newBoardStatus = (cellStatus = () => (Math.random() < 0.3 ? 1 : 0)) => {
 
 // Grid Component
 interface BoardGridProps {
-  boardStatus: any;
+  boardStatus: any[][];
 }
 
 const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
@@ -44,8 +45,9 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
             backgroundColor:
               boardStatus[r][c].status === 1
                 ? `hsl(${boardStatus[r][c].h}, ${boardStatus[r][c].s}%, ${boardStatus[r][c].l}%`
-                : 'white'
+                : 'black'
           }}
+          onClick={() => (boardStatus[r][c].status = !boardStatus[r][c].status)}
           data-cord={`${r},${c}`}
         />
       );
@@ -63,17 +65,26 @@ const BoardGrid: React.FC<BoardGridProps> = ({ boardStatus }) => {
 const App: React.FC = () => {
   // App State
   const [gameStatus, setGameStatus] = useState({
-    boardStatus: newBoardStatus(),
-    gameRunning: false
+    boardStatus: defaultState,
+    gameRunning: false,
+    generation: 0,
+    speed: 200,
+    livingCells: 0
   });
 
   // Stop Function
   const handleStop = () => {
-    setGameStatus({ ...gameStatus, gameRunning: false });
+    setGameStatus({
+      ...gameStatus,
+      gameRunning: false
+    });
   };
   // Start Function
   const handleStart = () => {
-    setGameStatus({ ...gameStatus, gameRunning: true });
+    setGameStatus({
+      ...gameStatus,
+      gameRunning: true
+    });
   };
 
   // Moves to next generation
@@ -97,7 +108,10 @@ const App: React.FC = () => {
             const row = (r + i + numberOfRows) % numberOfRows;
             const col = (c + j + numberOfCols) % numberOfCols;
 
-            color += boardStatus[row][col].h;
+            // If Cell is living then add its color
+            if (boardStatus[row][col].status) {
+              color += boardStatus[row][col].h;
+            }
 
             sum += boardStatus[row][col].status;
           }
@@ -108,7 +122,10 @@ const App: React.FC = () => {
 
         color = color / sum;
 
-        return { sum: sum, color: color };
+        return {
+          sum: sum,
+          color: color
+        };
       };
 
       for (let r = 0; r < totalRows; r++) {
@@ -118,10 +135,12 @@ const App: React.FC = () => {
 
           const { sum, color } = sumAndColor;
 
-          clonedBoardStatus[r][c].h = color;
+          // Living Cells
+
           if (!boardStatus[r][c].status) {
             if (sum === 3) {
               clonedBoardStatus[r][c].status = 1;
+              clonedBoardStatus[r][c].h = color;
             }
           } else {
             if (sum < 2 || sum > 3) {
@@ -134,24 +153,40 @@ const App: React.FC = () => {
       return clonedBoardStatus;
     };
 
-    let prevBoard: any[][] = gameStatus.boardStatus;
+    // Count Living Cells
+    const countLiving = () => {
+      let count: number = 0;
 
-    setGameStatus({ ...gameStatus, boardStatus: nextStep(prevBoard) });
-  }, [gameStatus]);
-
-  // Counts Living Cells on the Board
-  const countLiving = () => {
-    let count = 0;
-
-    for (let i = 0; i < totalRows; i++) {
-      for (let j = 0; j < totalCols; j++) {
-        if (gameStatus.boardStatus[i][j].status === 1) {
-          count++;
+      for (let r = 0; r < totalRows; r++) {
+        for (let c = 0; c < totalCols; c++) {
+          if (gameStatus.boardStatus[r][c].status === 1) {
+            count++;
+          }
         }
       }
-    }
 
-    console.log(count);
+      return count;
+    };
+
+    let prevBoard: any[][] = gameStatus.boardStatus;
+
+    setGameStatus({
+      ...gameStatus,
+      boardStatus: nextStep(prevBoard),
+      generation: gameStatus.generation + 1,
+      livingCells: countLiving()
+    });
+  }, [gameStatus]);
+
+  // Reset Board
+  const newBoard = () => {
+    setGameStatus({
+      ...gameStatus,
+      boardStatus: newBoardStatus(),
+      generation: 0,
+      gameRunning: false,
+      livingCells: 0
+    });
   };
 
   // Runs the animation
@@ -164,11 +199,11 @@ const App: React.FC = () => {
     } else {
       timer = setInterval(() => {
         handleGeneration();
-      }, 200);
+      }, gameStatus.speed);
 
       return () => clearInterval(timer);
     }
-  }, [gameStatus.gameRunning, handleGeneration]);
+  }, [gameStatus.gameRunning, gameStatus.speed, handleGeneration]);
 
   return (
     <div className='App'>
@@ -184,6 +219,17 @@ const App: React.FC = () => {
 
       <BoardGrid boardStatus={gameStatus.boardStatus} />
 
+      <p>
+        <strong>Generation:</strong> {gameStatus.generation}
+      </p>
+
+      {gameStatus.generation > 0 ? (
+        <p>
+          <strong>Living Cells: </strong>
+          {gameStatus.livingCells}/3200
+        </p>
+      ) : null}
+
       {gameStatus.gameRunning ? (
         <button className='button' disabled onClick={handleGeneration}>
           Test
@@ -194,10 +240,6 @@ const App: React.FC = () => {
         </button>
       )}
 
-      <button className='button' onClick={countLiving}>
-        Count Living
-      </button>
-
       {gameStatus.gameRunning ? (
         <button className='button' onClick={handleStop}>
           Stop Game
@@ -205,6 +247,16 @@ const App: React.FC = () => {
       ) : (
         <button className='button' onClick={handleStart}>
           Start Game
+        </button>
+      )}
+
+      {gameStatus.gameRunning ? (
+        <button className='button' disabled onClick={newBoard}>
+          New Board
+        </button>
+      ) : (
+        <button className='button' onClick={newBoard}>
+          New Board
         </button>
       )}
     </div>
