@@ -3,4 +3,4 @@ A variation of "Conways Game of Life", where each cell has an HSL value associat
 
 * [Video Showcase](https://youtu.be/D2PMpRZrMFg)
 
-Project was made for the **AlgoExpert SWE Project Contest Winter 2020**
+Project was made for the [**AlgoExpert SWE Project Contest Winter 2020**](https://www.algoexpert.io/swe-project-contests/2020-summer)
